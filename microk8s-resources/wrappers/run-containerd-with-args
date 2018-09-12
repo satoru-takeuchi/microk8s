@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+export PATH="$SNAP/usr/sbin:$SNAP/usr/bin:$SNAP/sbin:$SNAP/bin:$PATH"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SNAP/lib:$SNAP/usr/lib:$SNAP/lib/x86_64-linux-gnu:$SNAP/usr/lib/x86_64-linux-gnu"
+export LD_LIBRARY_PATH=$SNAP_LIBRARY_PATH:$LD_LIBRARY_PATH
+
+
+app=containerd
+
+sed 's@${SNAP}@'"${SNAP}"'@g;s@${SNAP_DATA}@'"${SNAP_DATA}"'@g' $SNAP_DATA/args/containerd-runc.toml > $SNAP_DATA/args/containerd.toml
+# This is really the only way I could find to get the args passed in correctly. WTF
+declare -a args="($(cat $SNAP_DATA/args/$app))"
+exec "$SNAP/bin/$app" "${args[@]}"
