@@ -144,6 +144,7 @@ parts:
       mkdir -p bin/
       cp $KUBE_SNAP_BINS/containerd/* bin/
       cp $KUBE_SNAP_BINS/runc/* bin/
+      cp $KUBE_SNAP_ROOT/microk8s-resources/containerd-profile .
 
       echo "Preparing etcd"
       cp $KUBE_SNAP_BINS/etcd/etcd .

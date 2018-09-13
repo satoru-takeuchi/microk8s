@@ -4,6 +4,13 @@ export PATH="$SNAP/usr/sbin:$SNAP/usr/bin:$SNAP/sbin:$SNAP/bin:$PATH"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SNAP/lib:$SNAP/usr/lib:$SNAP/lib/x86_64-linux-gnu:$SNAP/usr/lib/x86_64-linux-gnu"
 export LD_LIBRARY_PATH=$SNAP_LIBRARY_PATH:$LD_LIBRARY_PATH
 
+if [ -d "/etc/apparmor.d" ]; then
+  echo "Using a default profile template"
+  cp ${SNAP}/containerd-profile /etc/apparmor.d/cri-containerd.apparmor.d
+  echo "Reloading AppArmor profiles"
+  service apparmor reload
+  echo "AppArmor patched"
+fi
 
 app=containerd
 

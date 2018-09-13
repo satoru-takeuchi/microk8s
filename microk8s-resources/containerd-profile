@@ -3,7 +3,7 @@
 #include <tunables/global>
 
 
-profile snap.microk8s.daemon-containerd flags=(attach_disconnected,mediate_deleted) {
+profile cri-containerd.apparmor.d flags=(attach_disconnected,mediate_deleted) {
 
   #include <abstractions/base>
 
@@ -38,5 +38,5 @@ profile snap.microk8s.daemon-containerd flags=(attach_disconnected,mediate_delet
   ptrace (trace,read) peer=cri-containerd.apparmod.d,
 
   signal (receive) peer=snap.microk8s.daemon-kubelet,
-
+  signal (receive) peer=snap.microk8s.daemon-containerd,
 }
