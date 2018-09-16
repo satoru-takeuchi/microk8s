@@ -176,6 +176,9 @@ parts:
       echo "Preparing user config"
       cp $KUBE_SNAP_ROOT/microk8s-resources/client.config .
 
+      echo "Preparing istio"
+      cp $KUBE_SNAP_BINS/istioctl .
+
       echo "Creating commands and wrappers"
       cp $KUBE_SNAP_ROOT/microk8s-resources/wrappers/* .
 

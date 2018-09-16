@@ -42,8 +42,8 @@ oom_score = 0
         runtime_engine = ""
         runtime_root = ""
     [plugins.cri.cni]
-      bin_dir = "/snap/microk8s/current/opt/cni/bin"
-      conf_dir = "/home/jackal/workspace/bin/conf"
+      bin_dir = "${SNAP}/opt/cni/bin"
+      conf_dir = "${SNAP_DATA}/args/cni-network"
       conf_template = ""
     [plugins.cri.registry]
       [plugins.cri.registry.mirrors]
@@ -53,7 +53,7 @@ oom_score = 0
     default = ["walking"]
   [plugins.linux]
     shim = "containerd-shim"
-    runtime = "nvidia-container-runtime"
+    runtime = "${RUNTIME}"
     runtime_root = ""
     no_shim = false
     shim_debug = true

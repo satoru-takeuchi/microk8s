@@ -14,7 +14,10 @@ fi
 
 app=containerd
 
-sed 's@${SNAP}@'"${SNAP}"'@g;s@${SNAP_DATA}@'"${SNAP_DATA}"'@g' $SNAP_DATA/args/containerd-runc.toml > $SNAP_DATA/args/containerd.toml
+if [ ! -f $SNAP_DATA/args/containerd.toml ]
+then
+  sed 's@${SNAP}@'"${SNAP}"'@g;s@${SNAP_DATA}@'"${SNAP_DATA}"'@g;s@${RUNTIME}@runc@g' $SNAP_DATA/args/containerd-template.toml > $SNAP_DATA/args/containerd.toml
+fi
 # This is really the only way I could find to get the args passed in correctly. WTF
 declare -a args="($(cat $SNAP_DATA/args/$app))"
 exec "$SNAP/bin/$app" "${args[@]}"

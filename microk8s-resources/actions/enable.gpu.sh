@@ -13,7 +13,7 @@ else
   exit 1
 fi
 
-sudo sh -c "sed 's@${SNAP}@'"${SNAP}"'@g;s@${SNAP_DATA}@'"${SNAP_DATA}"'@g' $SNAP_DATA/args/containerd-nvidia.toml > $SNAP_DATA/args/containerd.toml"
+sudo sh -c "sed 's@\${SNAP}@'"${SNAP}"'@g;s@\${SNAP_DATA}@'"${SNAP_DATA}"'@g;s@\${RUNTIME}@nvidia-container-runtime@g' $SNAP_DATA/args/containerd-template.toml > $SNAP_DATA/args/containerd.toml"
 sudo systemctl restart snap.${SNAP_NAME}.daemon-containerd
 TRY_ATTEMPT=0
 while ! (sudo systemctl is-active --quiet snap.${SNAP_NAME}.daemon-containerd) &&
