@@ -14,17 +14,18 @@ else
 fi
 
 sudo sh -c "sed 's@\${SNAP}@'"${SNAP}"'@g;s@\${SNAP_DATA}@'"${SNAP_DATA}"'@g;s@\${RUNTIME}@nvidia-container-runtime@g' $SNAP_DATA/args/containerd-template.toml > $SNAP_DATA/args/containerd.toml"
-sudo systemctl restart snap.${SNAP_NAME}.daemon-containerd
-TRY_ATTEMPT=0
-while ! (sudo systemctl is-active --quiet snap.${SNAP_NAME}.daemon-containerd) &&
-      ! [ ${TRY_ATTEMPT} -eq 30 ]
-do
-  TRY_ATTEMPT=$((TRY_ATTEMPT+1))
-  sleep 1
-done
-if [ ${TRY_ATTEMPT} -eq 30 ]
+
+containerd_up=$(wait_for_service containerd)
+if [[ $containerd_up == fail ]]
 then
-  echo "Snapped containerd not responding after 30 seconds. Proceeding"
+  echo "Containerd did not start on time. Proceeding."
+fi
+# Allow for some seconds for containerd processes to start
+sleep 10
+kubelet_up=$(wait_for_service kubelet)
+if [[ $kubelet_up == fail ]]
+then
+  echo "Kubelet did not start on time. Proceeding."
 fi
 
 "$SNAP/microk8s-enable.wrapper" dns
