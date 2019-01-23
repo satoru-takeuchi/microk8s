@@ -14,4 +14,4 @@ sleep 10
 # in case this is a pre root-dir fix deployment
 (cat /proc/mounts | grep ${SNAP_COMMON}/pods | cut -d ' ' -f 2 | xargs umount) || true
 (cat /proc/mounts | grep ${SNAP_COMMON}/var/lib/containerd | cut -d ' ' -f 2 | xargs umount) || true
-(cat /proc/mounts | grep ${SNAP_COMMON}/var/run/containerd | cut -d ' ' -f 2 | xargs umount) || true
+(cat /proc/mounts | grep ${SNAP_COMMON}/run/containerd | cut -d ' ' -f 2 | xargs umount) || true
