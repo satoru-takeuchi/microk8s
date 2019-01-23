@@ -42,9 +42,6 @@ apps:
   kubectl:
     command: microk8s-kubectl.wrapper
     completer: kubectl.bash
-  docker:
-    command: microk8s-docker.wrapper
-    completer: docker.bash
   inspect:
     command: sudo SNAP_DATA=${SNAP_DATA} ${SNAP}/inspect.sh
   enable:
@@ -88,23 +85,74 @@ parts:
     - "--disable-shared"
     - "--enable-static"
     prime: [ -bin/iptables-xml ]
-  docker:
-    after: [iptables]
-    plugin: dump
-    stage-packages:
-    - conntrack
-    - docker.io
-    - aufs-tools
-    - gawk
-    - sed
+  go:
+    source-tag: go1.10.4
+  containerd:
+    after: [go, iptables]
     source: .
+    plugin: go
+    go-importpath: github.com/containerd/containerd
+    build-packages:
+    - btrfs-tools
+    - libseccomp-dev
+    override-build: |
+      set -eux
+
+      # RUNC commit matching the containerd release commit
+      # Tag 1.2.2
+      CONTAINERD_COMMIT=9754871865f7fe2f4e74d43e2fc7ccd237edcbce
+      # Release v1.0.0~rc6
+      RUNC_COMMIT=ccb5efd37fb7c86364786e9137e22948751de7ed
+
+      go version
+      export GOPATH=$(realpath ../go)
+      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
+      # Build containerd
+      go get github.com/containerd/containerd
+      (
+        cd $GOPATH/src/github.com/containerd/containerd
+        git checkout ${CONTAINERD_COMMIT}
+        # building the btrfs driver can be disabled via the
+        # build tag no_btrfs, removing this dependency
+        make
+      )
+      cp $GOPATH/src/github.com/containerd/containerd/bin/* $SNAPCRAFT_PART_INSTALL/bin/
+      rm $SNAPCRAFT_PART_INSTALL/bin/containerd-stress
+
+      # Build runc
+      go get github.com/opencontainers/runc
+      (
+        cd $GOPATH/src/github.com/opencontainers/runc
+        git checkout ${RUNC_COMMIT}
+        make
+      )
+      cp $GOPATH/src/github.com/opencontainers/runc/runc $SNAPCRAFT_PART_INSTALL/bin/
+
+      # Assemble the snap
+      # snapcraftctl build
+    organize:
+      containerd/install/bin/*: bin/
     stage:
     - -sbin/xtables-multi
     - -sbin/iptables*
     - -lib/xtables
-    override-build: "true"
+#  docker:
+#    after: [iptables]
+#    plugin: dump
+#    stage-packages:
+#    - conntrack
+#    - docker.io
+#    - aufs-tools
+#    - gawk
+#    - sed
+#    source: .
+#    stage:
+#    - -sbin/xtables-multi
+#    - -sbin/iptables*
+#    - -lib/xtables
+#    override-build: "true"
   microk8s:
-    after: [docker]
+    after: [containerd]
     plugin: dump
     build-attributes: [no-patchelf]
     build-packages:
@@ -118,6 +166,10 @@ parts:
     - socat
     - iproute2
     - dpkg
+    - conntrack
+    - aufs-tools
+    - gawk
+    - sed
     source: .
     override-build: |
       set -eu
@@ -141,9 +193,6 @@ parts:
       cp $KUBE_SNAP_BINS/cni/* opt/cni/bin/
 
       echo "Preparing containerd"
-      mkdir -p bin/
-      cp $KUBE_SNAP_BINS/containerd/* bin/
-      cp $KUBE_SNAP_BINS/runc/* bin/
       cp $KUBE_SNAP_ROOT/microk8s-resources/containerd-profile .
 
       echo "Preparing etcd"
@@ -209,10 +258,6 @@ parts:
 
       echo "Creating inspect hook"
       cp $KUBE_SNAP_ROOT/scripts/inspect.sh .
-
-      # Add bash completion for microk8s.docker
-      cp $SNAPCRAFT_STAGE/usr/share/bash-completion/completions/docker docker.bash
-      sed  -i "s/complete -F _docker docker docker.exe dockerd dockerd.exe/complete -F _docker microk8s.docker/g" docker.bash
 
       # Add bash completion for microk8s.kubectl. 
       ./kubectl completion bash | sed "s/complete -o default -F __start_kubectl kubectl/complete -o default -F __start_kubectl microk8s.kubectl/g" | sed "s/complete -o default -o nospace -F __start_kubectl kubectl/complete -o default -o nospace -F __start_kubectl kubectl/g" > kubectl.bash
