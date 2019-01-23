@@ -96,13 +96,8 @@ parts:
     - btrfs-tools
     - libseccomp-dev
     override-build: |
-      set -eux
-
-      # RUNC commit matching the containerd release commit
-      # Tag 1.2.2
-      CONTAINERD_COMMIT=9754871865f7fe2f4e74d43e2fc7ccd237edcbce
-      # Release v1.0.0~rc6
-      RUNC_COMMIT=ccb5efd37fb7c86364786e9137e22948751de7ed
+      set -eu
+      . build-scripts/prepare-env.sh
 
       go version
       export GOPATH=$(realpath ../go)
@@ -136,21 +131,6 @@ parts:
     - -sbin/xtables-multi
     - -sbin/iptables*
     - -lib/xtables
-#  docker:
-#    after: [iptables]
-#    plugin: dump
-#    stage-packages:
-#    - conntrack
-#    - docker.io
-#    - aufs-tools
-#    - gawk
-#    - sed
-#    source: .
-#    stage:
-#    - -sbin/xtables-multi
-#    - -sbin/iptables*
-#    - -lib/xtables
-#    override-build: "true"
   microk8s:
     after: [containerd]
     plugin: dump
