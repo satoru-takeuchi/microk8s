@@ -15,6 +15,7 @@ fi
 
 sudo sh -c "sed 's@\${SNAP}@'"${SNAP}"'@g;s@\${SNAP_DATA}@'"${SNAP_DATA}"'@g;s@\${RUNTIME}@nvidia-container-runtime@g' $SNAP_DATA/args/containerd-template.toml > $SNAP_DATA/args/containerd.toml"
 
+sudo systemctl restart snap.${SNAP_NAME}.daemon-containerd
 containerd_up=$(wait_for_service containerd)
 if [[ $containerd_up == fail ]]
 then
@@ -22,11 +23,6 @@ then
 fi
 # Allow for some seconds for containerd processes to start
 sleep 10
-kubelet_up=$(wait_for_service kubelet)
-if [[ $kubelet_up == fail ]]
-then
-  echo "Kubelet did not start on time. Proceeding."
-fi
 
 "$SNAP/microk8s-enable.wrapper" dns
 
