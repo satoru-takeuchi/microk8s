@@ -6,6 +6,7 @@ services: [docker]
 
 script:
   - docker run -v $(pwd):$(pwd) -w $(pwd) snapcore/snapcraft:stable sh -c "apt update && snapcraft"
+  - ./tests/patch-dockerd.sh
   - sudo apt update
   - sudo apt install --yes snapd
   - sudo snap install *.snap --classic --dangerous

@@ -25,7 +25,7 @@ class TestAddons(object):
         yield
         microk8s_reset()
 
-    def _test_dns_dashboard(self):
+    def test_dns_dashboard(self):
         """
         Sets up dashboard and validates it works.
 
@@ -42,7 +42,7 @@ class TestAddons(object):
         print("Disabling dashboard")
         microk8s_disable("dashboard")
 
-    def _test_storage_registry(self):
+    def test_storage_registry(self):
         """
         Sets up and tests the storage addon and the private registry.
 
@@ -60,7 +60,7 @@ class TestAddons(object):
         p = Popen("/snap/bin/microk8s.disable storage".split(), stdout=PIPE, stdin=PIPE, stderr=STDOUT)
         p.communicate(input=b'Y\n')[0]
 
-    def _test_ingress(self):
+    def test_ingress(self):
         """
         Sets up ingress addon and validates it works.
 
@@ -97,7 +97,7 @@ class TestAddons(object):
         print("Disabling DNS")
         microk8s_disable("dns")
 
-    def _test_istio(self):
+    def test_istio(self):
         """
         Sets up and validate istio.
 
@@ -116,7 +116,7 @@ class TestAddons(object):
         print("Disabling DNS")
         microk8s_disable("dns")
 
-    def _test_forward(self):
+    def test_forward(self):
         """
         Test port forward.
 
@@ -124,7 +124,7 @@ class TestAddons(object):
         print("Validating Port Forward")
         validate_forward()
 
-    def _test_metrics_server(self):
+    def test_metrics_server(self):
         """
         Test the metrics server.
 

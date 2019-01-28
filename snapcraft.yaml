@@ -42,6 +42,8 @@ apps:
   kubectl:
     command: microk8s-kubectl.wrapper
     completer: kubectl.bash
+  ctr:
+    command: microk8s-ctr.wrapper
   inspect:
     command: sudo SNAP_DATA=${SNAP_DATA} ${SNAP}/inspect.sh
   enable:

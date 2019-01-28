@@ -49,6 +49,8 @@ oom_score = 0
       [plugins.cri.registry.mirrors]
         [plugins.cri.registry.mirrors."docker.io"]
           endpoint = ["https://registry-1.docker.io"]
+        [plugins.cri.registry.mirrors."local.insecure-registry.io"]
+          endpoint = ["http://localhost:32000"]
   [plugins.diff-service]
     default = ["walking"]
   [plugins.linux]

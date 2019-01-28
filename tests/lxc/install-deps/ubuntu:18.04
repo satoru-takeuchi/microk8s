@@ -3,5 +3,5 @@
 export $(grep -v '^#' /etc/environment | xargs)
 
 apt-get update
-apt-get install python-pip -y
+apt-get install python-pip docker.io -y
 pip install -U pytest requests pyyaml
